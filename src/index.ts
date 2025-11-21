@@ -34,8 +34,12 @@ app.post('/generate', async (req, res): Promise<void> => {
         const chatting = await chat(chatMsg, "Summarize the article provided.");
 
         res.json({
-            ai_summary: chatting,
-            searchResults: lawbookSearch.map(result => ({
+            ai_response: chatting,
+            law_context: lawbookSearch.map(result => ({
+                tag_name: result.getTagName(),
+                text: result.getTagDescription()
+            })),
+            evidence_context: evidenceSearch.map(result => ({
                 tag_name: result.getTagName(),
                 text: result.getTagDescription()
             })),

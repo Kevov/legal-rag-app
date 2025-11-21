@@ -5,7 +5,7 @@ const GOOGLE_AI_KEY = process.env.GOOGLE_GEMINI_KEY;
 
 export async function chat(chatMsg: string, context: string): Promise<string> {
   if (!chatMsg) {
-    throw new Error("Article content is required for summarization.");
+    throw new Error("Question message is required for chat.");
   }
   if (!context) {
     throw new Error("Context is required for chat.");
@@ -18,7 +18,8 @@ export async function chat(chatMsg: string, context: string): Promise<string> {
   });
 
   const messages = [
-    new SystemMessage("Please summarize the following article in 3 to 4 sentences."),
+    new SystemMessage("You are a helpful legal assistant AI that provides advice for small-claim legal matters based on the context provided."),
+    new SystemMessage(`Context: ${context}`),
     new HumanMessage(chatMsg),
   ];
 
@@ -35,7 +36,7 @@ export async function chat(chatMsg: string, context: string): Promise<string> {
     }
     throw new Error("Unexpected response format from model.");
   } catch (error) {
-    console.error("Error during summarization:", error);
-    throw new Error("An error occurred while generating the summary.");
+    console.error("Error getting AI answers:", error);
+    throw new Error("An error occurred while generating AI answers.");
   }
 }
