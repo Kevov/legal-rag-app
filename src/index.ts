@@ -30,8 +30,9 @@ app.post('/generate', async (req, res): Promise<void> => {
         }
         
         const lawbookSearch = await vectorStoreSearch(chatMsg);
-        const evidenceSearch = await vectorStoreSearch(chatMsg);
-        const chatting = await chat(chatMsg, "Summarize the article provided.");
+        // const evidenceSearch = await vectorStoreSearch(chatMsg);
+        const lawbookObj = lawbookSearch.map(result => result.getTagDescription()).join("\n");
+        const chatting = await chat(chatMsg, lawbookObj);
 
         res.json({
             ai_response: chatting,
@@ -39,10 +40,10 @@ app.post('/generate', async (req, res): Promise<void> => {
                 tag_name: result.getTagName(),
                 text: result.getTagDescription()
             })),
-            evidence_context: evidenceSearch.map(result => ({
-                tag_name: result.getTagName(),
-                text: result.getTagDescription()
-            })),
+            // evidence_context: evidenceSearch.map(result => ({
+            //     tag_name: result.getTagName(),
+            //     text: result.getTagDescription()
+            // })),
             original_input: chatMsg 
     });
     } catch (error) {

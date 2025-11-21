@@ -1,7 +1,16 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { PromptTemplate } from "@langchain/core/prompts";
 
 const GOOGLE_AI_KEY = process.env.GOOGLE_GEMINI_KEY;
+const CHAT_TEMPLATE = `
+    You are a helpful legal assistant AI that provides advice for small-claim legal matters based on the context provided:
+    {context}
+
+    Question: {question}
+
+    Answer:
+    `;
 
 export async function chat(chatMsg: string, context: string): Promise<string> {
   if (!chatMsg) {
@@ -17,11 +26,10 @@ export async function chat(chatMsg: string, context: string): Promise<string> {
     apiKey: GOOGLE_AI_KEY
   });
 
-  const messages = [
-    new SystemMessage("You are a helpful legal assistant AI that provides advice for small-claim legal matters based on the context provided."),
-    new SystemMessage(`Context: ${context}`),
-    new HumanMessage(chatMsg),
-  ];
+  const messages = await PromptTemplate.fromTemplate(CHAT_TEMPLATE).format({
+    context: context,
+    question: chatMsg
+  });
 
   try {
     const response = await model.invoke(messages);
