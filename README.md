@@ -1,4 +1,4 @@
-# ai-taxonomy-recommendation
+# legal-rag-app
 
 
 ## Setting Up
@@ -21,50 +21,3 @@ If you want to mess around with the code and see updates happening in real-time 
 npm run dev
 ```
 Once that is done, you can access the server through  ```localhost:3000``` by default.
-
-## Adding Tags to Your Existing Atlas Vector Database
-To add a list of new tags to your existing vector database, call route ```/input_tag``` as a POST request. So to get a response, your URL should be ```localhost:3000/input_tag```.
-
-The basic input format for the request body:
-```json
-{
-    "tagList": [
-        {
-            "tag_name": "<your tag name>",
-            "text": "<your tag description>"
-        }
-    ]
-}
-```
-The ```tag_list``` object is an array, so you can add in multiple tags at once.
-
-Once the tags have been successfully added, you can go to your MongoDB Atlas collection to check the values themselves. The server will return a short response confirming that the tags have been added. The response would look like below:
-```json
-{
-    "message": "Tag input successful",
-    "tags_inserted": <number of tags being added excluding any duplicates>
-}
-```
-
-## Querying from Your Existing Atlas Vector Database
-To query a list of tags from an existing database, call route ```/generate``` as a POST request. So to get a response, your URL should be ```localhost:3000/generate```.
-
-The basic input format for the request body:
-```json
-{
-    "text": "<your article content here>"
-}
-```
-The output format of the response body:
-```json
-{
-    "ai_summary": "<The search query created from your article>",
-    "searchResults": [
-        {
-            "tag_name": "<name>",
-            "text": "<description>"
-        }
-    ],
-    "original_input": "<your original article content>"
-}
-```
