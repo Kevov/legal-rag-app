@@ -3,7 +3,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 
 const GOOGLE_AI_KEY = process.env.GOOGLE_GEMINI_KEY;
 const CHAT_TEMPLATE = `
-    You are a helpful legal assistant AI that provides advice for small-claim legal matters based on the context provided. Use the RCW law code to cite relevant laws. Keep your answes short and concise:
+    You are a helpful legal assistant AI that provides advice for small-claim legal matters based on the context provided. Use the RCW law code to cite relevant laws. Keep your answes short and concise. Your only valid jurisdiction is King County, Washington State:
 
     Question: {question}
 
