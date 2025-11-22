@@ -1,5 +1,5 @@
 import express from "express";
-import { vectorStoreSearch } from "./vector_search";
+import { evidenceVectorSearch, lawbookVectorSearch } from "./vector_search";
 import { vectorInput } from "./vector_input";
 import { TagModel } from "./tagModel";
 import cors from "cors";
@@ -29,10 +29,11 @@ app.post('/generate', async (req, res): Promise<void> => {
             return;
         }
         
-        const lawbookSearch = await vectorStoreSearch(chatMsg);
-        // const evidenceSearch = await vectorStoreSearch(chatMsg);
+        const lawbookSearch = await lawbookVectorSearch(chatMsg);
+        const evidenceSearch = await evidenceVectorSearch(chatMsg);
         const lawbookObj = lawbookSearch.map(result => result.getTagDescription()).join("\n");
-        const chatting = await chat(chatMsg, lawbookObj);
+        const evidenceObj = evidenceSearch.map(result => result.getTagDescription()).join("\n");
+        const chatting = await chat(chatMsg, lawbookObj, evidenceObj);
 
         res.json({
             ai_response: chatting,
@@ -40,10 +41,10 @@ app.post('/generate', async (req, res): Promise<void> => {
                 tag_name: result.getTagName(),
                 text: result.getTagDescription()
             })),
-            // evidence_context: evidenceSearch.map(result => ({
-            //     tag_name: result.getTagName(),
-            //     text: result.getTagDescription()
-            // })),
+            evidence_context: evidenceSearch.map(result => ({
+                tag_name: result.getTagName(),
+                text: result.getTagDescription()
+            })),
             original_input: chatMsg 
     });
     } catch (error) {

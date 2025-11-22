@@ -7,14 +7,16 @@ const CHAT_TEMPLATE = `
 
     Question: {question}
 
-    Context: {context}
+    Law Context: {lawbook_context}
+
+    Evidence Context: {evidence_context} 
     `;
 
-export async function chat(chatMsg: string, context: string): Promise<string> {
+export async function chat(chatMsg: string, lawbookContext: string, evidenceContext: string): Promise<string> {
   if (!chatMsg) {
     throw new Error("Question message is required for chat.");
   }
-  if (!context) {
+  if (!lawbookContext) {
     throw new Error("Context is required for chat.");
   }
 
@@ -25,7 +27,8 @@ export async function chat(chatMsg: string, context: string): Promise<string> {
   });
 
   const messages = await PromptTemplate.fromTemplate(CHAT_TEMPLATE).format({
-    context: context,
+    lawbook_context: lawbookContext,
+    evidence_context: evidenceContext,
     question: chatMsg
   });
 
