@@ -1,15 +1,13 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { PromptTemplate } from "@langchain/core/prompts";
 
 const GOOGLE_AI_KEY = process.env.GOOGLE_GEMINI_KEY;
 const CHAT_TEMPLATE = `
-    You are a helpful legal assistant AI that provides advice for small-claim legal matters based on the context provided:
-    {context}
+    You are a helpful legal assistant AI that provides advice for small-claim legal matters based on the context provided. Use the RCW law code to cite relevant laws. Keep your answes short and concise:
 
     Question: {question}
 
-    Answer:
+    Context: {context}
     `;
 
 export async function chat(chatMsg: string, context: string): Promise<string> {

@@ -52,9 +52,10 @@ app.post('/generate', async (req, res): Promise<void> => {
     }
 });
 
-app.post('/input_tag', async (req, res): Promise<void> => {
+app.post('/input_law_book', async (req, res): Promise<void> => {
     const tagListObj = req.body.tagList;
-    
+    const collection: string = "law-book"
+
     try {
         if (!tagListObj) {
             res.status(400).json({ error: 'Tag list is required for inputting to MongoDB Atlas.' });
@@ -62,14 +63,36 @@ app.post('/input_tag', async (req, res): Promise<void> => {
         }
         console.log("Received tag list:", tagListObj);
         const tagList: TagModel[] = tagListObj.map((tag: { tag_name: string; text: string }) => TagModel.fromObject(tag));
-        const insertedTagsNum: number = await vectorInput(tagList);
+        const insertedTagsNum: number = await vectorInput(tagList, collection);
         res.json({ 
-            message: 'Tag input successful',
+            message: 'Laws input successful',
             tags_inserted: insertedTagsNum 
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'An error occurred while inputting the tag to MongoDB Atlas' })
+        res.status(500).json({ error: 'An error occurred while inputting the law to MongoDB Atlas' })
+    }
+});
+
+app.post('/input_evidence', async (req, res): Promise<void> => {
+    const tagListObj = req.body.tagList;
+    const collection: string = "law-evidence"
+
+    try {
+        if (!tagListObj) {
+            res.status(400).json({ error: 'Tag list is required for inputting to MongoDB Atlas.' });
+            return;
+        }
+        console.log("Received tag list:", tagListObj);
+        const tagList: TagModel[] = tagListObj.map((tag: { tag_name: string; text: string }) => TagModel.fromObject(tag));
+        const insertedTagsNum: number = await vectorInput(tagList, collection);
+        res.json({ 
+            message: 'Evidence input successful',
+            tags_inserted: insertedTagsNum 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while inputting the evidence to MongoDB Atlas' })
     }
 });
 

@@ -5,7 +5,7 @@ import { TagModel } from "./tagModel"; // Assuming you have a TagModel class def
 const GOOGLE_AI_KEY = process.env.GOOGLE_GEMINI_KEY;
 const MONGO_ATLAS_CONNECTION_URI = process.env.MONGO_ATLAS_CONNECTION_URI;
 
-export async function vectorInput(tagList: TagModel[]): Promise<number> {
+export async function vectorInput(tagList: TagModel[], collectionName: string): Promise<number> {
     if (!MONGO_ATLAS_CONNECTION_URI) {
             throw new Error("MONGO_ATLAS_CONNECTION_URI is not set in the environment variables.");
         }
@@ -13,7 +13,7 @@ export async function vectorInput(tagList: TagModel[]): Promise<number> {
     try {
         // define your Atlas Vector Search index
         const database = client.db("epic-tags");
-        const collection = database.collection("tags2");
+        const collection = database.collection(collectionName);
         const embeddingModel = new GoogleGenerativeAIEmbeddings({
             model: "text-embedding-004",
             apiKey: GOOGLE_AI_KEY

@@ -15,7 +15,7 @@ export async function vectorStoreSearch(input: string): Promise<SearchOutputMode
     try {
         // Configure your Atlas collection
         const database = client.db("epic-tags");
-        const collection = database.collection("tags2");
+        const collection = database.collection("law-book");
         const embeddingModel = new GoogleGenerativeAIEmbeddings({
             model: "text-embedding-004",
             apiKey: GOOGLE_AI_KEY
@@ -28,7 +28,7 @@ export async function vectorStoreSearch(input: string): Promise<SearchOutputMode
         });
 
         // Perform similarity search
-        const results = await vectorStore.similaritySearch(input, 6); // 6 is the number of results to return
+        const results = await vectorStore.similaritySearch(input, 2); // 6 is the number of results to return
 
         const formattedResults: SearchOutputModel[] = results.map(doc => {
             try {
