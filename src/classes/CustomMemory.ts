@@ -8,6 +8,9 @@ export class CustomMemory {
     public set(key: string, value: string) {
         if (this.memoryStore.has(key)) {
             const existingValues = this.memoryStore.get(key) || [];
+            if (existingValues.length >= 50) {
+                existingValues.shift(); // Remove the oldest entry
+            }
             this.memoryStore.set(key, existingValues.concat(value));
         } else {
             this.memoryStore.set(key, [value]);
