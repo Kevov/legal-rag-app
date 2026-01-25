@@ -36,7 +36,6 @@ export async function chat(convoID: string, chatMsg: string, washLawbookContext:
   });
 
   const currMemory = memory.get(convoID) || "nothing";
-  console.log("Current Memory for convoID", convoID, ":", currMemory);
 
   const messages = await PromptTemplate.fromTemplate(CHAT_TEMPLATE).format({
     washington_state_lawbook_context: washLawbookContext,
