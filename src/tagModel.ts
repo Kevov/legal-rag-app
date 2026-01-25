@@ -16,6 +16,10 @@ export class TagModel {
         return new TagModel(obj.tag_name, obj.text);
     }
 
+    public static fromString(tagName: string, text: string): TagModel {
+        return new TagModel(tagName, text);
+    }
+
     public getTagName(): string {
         return this.tag_name;
     }

@@ -4,6 +4,7 @@ import { vectorInput } from "./vector_input";
 import { TagModel } from "./tagModel";
 import cors from "cors";
 import { chat } from "./lawAIChatBot";
+import { parseDocument } from "./documentParse";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -125,6 +126,24 @@ app.post('/input_evidence', async (req, res): Promise<void> => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while inputting the evidence to MongoDB Atlas' })
+    }
+});
+
+app.post('/input_evidence_doc', async (req, res): Promise<void> => {
+    try {
+        const documents = await parseDocument('./src/test_evidence_document.pdf');
+        const tagList: TagModel[] = documents.map((docText: string, index: number) => 
+            TagModel.fromString(`evidence_doc_page_${index + 1}`, docText)
+        );
+        const collection: string = "law-evidence"
+        const insertedTagsNum: number = await vectorInput(tagList, collection);
+        res.json({ 
+            message: 'Evidence document parsed successfully',
+            tags_inserted: insertedTagsNum
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while parsing the evidence PDF' })
     }
 });
 
