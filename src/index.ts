@@ -19,25 +19,34 @@ app.use(cors({
 // Routes
 app.get('/', (req, res) => {
   res.send('Hello, Node.js Server lol!');
+  console.log("Received chat message:");
 });
 
 app.post('/generate', async (req, res): Promise<void> => {
     const chatMsg: string = req.body.text;
+    const convoID: string = req.headers['convoid'] as string || 'default_convo';
     try {
         if (!chatMsg) {
             res.status(400).json({ error: 'Article content is required for summarization.' });
             return;
         }
         
-        const lawbookSearch = await lawbookVectorSearch(chatMsg);
+        const washingtonStateLawbookSearch = await lawbookVectorSearch("washington-state-law-book", chatMsg);
+        const kingCountyLawbookSearch = await lawbookVectorSearch("king-county-law-book", chatMsg);
         const evidenceSearch = await evidenceVectorSearch(chatMsg);
-        const lawbookObj = lawbookSearch.map(result => result.getTagDescription()).join("\n");
+        const washingtonStateLawbookObj = washingtonStateLawbookSearch.map(result => result.getTagDescription()).join("\n");
+        const kingCountyLawbookObj = kingCountyLawbookSearch.map(result => result.getTagDescription()).join("\n");
         const evidenceObj = evidenceSearch.map(result => result.getTagDescription()).join("\n");
-        const chatting = await chat(chatMsg, lawbookObj, evidenceObj);
+        
+        const chatting = await chat(convoID, chatMsg, washingtonStateLawbookObj, kingCountyLawbookObj, evidenceObj);
 
         res.json({
             ai_response: chatting,
-            law_context: lawbookSearch.map(result => ({
+            wash_law_context: washingtonStateLawbookSearch.map(result => ({
+                tag_name: result.getTagName(),
+                text: result.getTagDescription()
+            })),
+            king_law_context: kingCountyLawbookSearch.map(result => ({
                 tag_name: result.getTagName(),
                 text: result.getTagDescription()
             })),
@@ -53,9 +62,31 @@ app.post('/generate', async (req, res): Promise<void> => {
     }
 });
 
-app.post('/input_law_book', async (req, res): Promise<void> => {
+app.post('/input_washington_law_book', async (req, res): Promise<void> => {
     const tagListObj = req.body.tagList;
-    const collection: string = "law-book"
+    const collection: string = "washington-state-law-book"
+
+    try {
+        if (!tagListObj) {
+            res.status(400).json({ error: 'Tag list is required for inputting to MongoDB Atlas.' });
+            return;
+        }
+        console.log("Received tag list:", tagListObj);
+        const tagList: TagModel[] = tagListObj.map((tag: { tag_name: string; text: string }) => TagModel.fromObject(tag));
+        const insertedTagsNum: number = await vectorInput(tagList, collection);
+        res.json({ 
+            message: 'Laws input successful',
+            tags_inserted: insertedTagsNum 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while inputting the law to MongoDB Atlas' })
+    }
+});
+
+app.post('/input_kingcounty_law_book', async (req, res): Promise<void> => {
+    const tagListObj = req.body.tagList;
+    const collection: string = "king-county-law-book"
 
     try {
         if (!tagListObj) {
@@ -96,6 +127,31 @@ app.post('/input_evidence', async (req, res): Promise<void> => {
         res.status(500).json({ error: 'An error occurred while inputting the evidence to MongoDB Atlas' })
     }
 });
+
+// app.get('/test', async (_, res): Promise<void> => {
+//     try {
+//         const data = require('../test.json');
+//         const items = data.pages.map((page: any) => page.items).flat();
+//         const reformattedItems = items.map((obj: any) => ({value: obj.value, bBox: obj.bBox}));
+//         let header = "";
+//         let currString = ""
+//         let arr = []
+//         for (const item of reformattedItems) {
+//             if (item.bBox.label === "paragraph_title") {
+//                 header = item.value;
+//             } else if (currString.length < 500) {
+//                 currString += " " + item.value
+//             } else {
+//                 arr.push({tag_name: header, text: currString});
+//                 currString = "";
+//             }
+//         }
+//         res.json(arr);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'An error occurred while fetching test data' });
+//     }
+// });
 
 // Start server
 app.listen(PORT, () => {

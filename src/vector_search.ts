@@ -7,7 +7,7 @@ import { SearchOutputModel } from "./searchOutputModel";
 const GOOGLE_AI_KEY = process.env.GOOGLE_GEMINI_KEY;
 const MONGO_ATLAS_CONNECTION_URI = process.env.MONGO_ATLAS_CONNECTION_URI;
 
-export async function lawbookVectorSearch(input: string): Promise<SearchOutputModel[]> {
+export async function lawbookVectorSearch(vectorDB: string, input: string): Promise<SearchOutputModel[]> {
     if (!MONGO_ATLAS_CONNECTION_URI) {
         throw new Error("MONGO_ATLAS_CONNECTION_URI is not set in the environment variables.");
     }
@@ -15,7 +15,7 @@ export async function lawbookVectorSearch(input: string): Promise<SearchOutputMo
     try {
         // Configure your Atlas collection
         const database = client.db("epic-tags");
-        const collection = database.collection("law-book");
+        const collection = database.collection(vectorDB);
         const embeddingModel = new GoogleGenerativeAIEmbeddings({
             model: "text-embedding-004",
             apiKey: GOOGLE_AI_KEY
@@ -28,7 +28,7 @@ export async function lawbookVectorSearch(input: string): Promise<SearchOutputMo
         });
 
         // Perform similarity search
-        const results = await vectorStore.similaritySearch(input, 2); // 6 is the number of results to return
+        const results = await vectorStore.similaritySearch(input, 4); // 6 is the number of results to return
 
         const formattedResults: SearchOutputModel[] = results.map(doc => {
             try {
